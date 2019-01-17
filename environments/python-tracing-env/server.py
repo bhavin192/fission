@@ -37,7 +37,11 @@ class FuncApp(Flask):
         def load():
             # load user function from codepath
             codepath = '/userfunc/user'
-            self.userfunc = (imp.load_source('user', codepath)).main
+            userfunc = (imp.load_source('user', codepath)).main
+            if os.getenv('ENABLE_TRACING') is not None:
+                self.userfunc = initialize_tracing(userfunc)
+            else:
+                self.userfunc = userfunc
             return ""
 
         @self.route('/v2/specialize', methods=['POST'])
@@ -79,8 +83,11 @@ class FuncApp(Flask):
                 mod = imp.load_source(moduleName, filepath)
 
             # load user function from module
-            self.userfunc = getattr(mod, funcName)
-
+            userfunc = getattr(mod, funcName)
+            if os.getenv('ENABLE_TRACING') is not None:
+                self.userfunc = initialize_tracing(userfunc)
+            else:
+                self.userfunc = userfunc
             return ""
 
         @self.route('/healthz', methods=['GET'])
@@ -103,8 +110,7 @@ class FuncApp(Flask):
             # And the user func can then access that
             # (after doing a"from flask import g").
 
-            userfunc_with_tracing = initialize_tracing(self.userfunc)
-            return userfunc_with_tracing()
+            return self.userfunc()
 
 
 app = FuncApp(__name__, logging.DEBUG)

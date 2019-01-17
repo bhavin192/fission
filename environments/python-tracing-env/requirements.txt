@@ -2,9 +2,13 @@ flask ~= 0.12.3
 bjoern
 httplib2
 python-dateutil
-requests==2.20.0
+requests == 2.20.0
 redis
 hiredis
 gevent
-opentracing>=2,<3
-jaeger-client>=3.8,<4
+opentracing >= 2,<3
+# TODO: using https://github.com/bhavin192/jaeger-client-python/tree/128-bit-trace-id-stable till
+# https://github.com/jaegertracing/jaeger-client-python/pull/230 gets merged
+# jaeger-client >= 3.13.0,<4
+-e git+https://github.com/bhavin192/jaeger-client-python.git@e9053003ad72f49901406404b1e3e885204ba8f1#egg=jaeger-client
+kafka-python
