@@ -5,6 +5,8 @@ from opentracing.ext import tags as ext_tags
 from uuid import UUID
 import logging
 
+FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+logging.basicConfig(format=FORMAT)
 logger = logging.getLogger("lib.tracing")
 # Tracer is created globally and initialized only once because of
 # following bug.
