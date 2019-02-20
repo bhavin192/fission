@@ -1,5 +1,6 @@
 from jaeger_client import Config
 from flask import request, make_response, g
+from opentracing import follows_from
 from opentracing.propagation import Format
 from opentracing.ext import tags as ext_tags
 from uuid import UUID
@@ -49,8 +50,11 @@ will be generated as trace_id")
             logger.info("created new tracer: %s", tracer)
         span_ctx = tracer.extract(Format.HTTP_HEADERS, request.headers)
         logger.info("created new span_ctx: %s", span_ctx)
+        # passing it as reference instead of child_of relation as we
+        # have async calls to services
+        span_reference = follows_from(referenced_context=span_ctx)
         response = None
-        with tracer.start_span(span_name, child_of=span_ctx) as span:
+        with tracer.start_span(span_name, references=span_reference) as span:
             # set the eventID as trace_id if not a child span
             # and trace_id is parsed successfully
             if not span_ctx and trace_id:
